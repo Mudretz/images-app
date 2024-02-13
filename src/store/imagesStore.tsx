@@ -1,30 +1,33 @@
-import {makeAutoObservable, runInAction} from 'mobx';
-import {Images} from '../shared/types';
-import {imagesService} from '../service';
+import { makeAutoObservable, runInAction } from "mobx";
+import { imagesService } from "../service";
+import { Images } from "../shared/types";
 
 class ImagesStore {
-  images: Images[] = [];
-  isLoading = false;
-  isError = false;
+    images: Images[] = [];
+    limit = 10;
 
-  constructor() {
-    makeAutoObservable(this);
-  }
-
-  getImages = async () => {
-    try {
-      this.isLoading = true;
-      const response = await imagesService.getImages();
-      console.log(response);
-      runInAction(() => {
-        this.images = response.photos;
-        this.isLoading = false;
-      });
-    } catch {
-      this.isLoading = false;
-      this.isError = false;
+    constructor() {
+        makeAutoObservable(this);
     }
-  };
+
+    increaseLimit = () => {
+        this.limit += 10;
+    };
+
+    getImages = async () => {
+        try {
+            const response = await imagesService.getImages({
+                limit: this.limit,
+            });
+            // Обновляем состояние внутри runInAction, чтобы MobX мог отследить изменения
+            runInAction(() => {
+                this.images = response.photos;
+            });
+        } catch (error) {
+            // Обработка ошибок, если это необходимо
+            console.error("Failed to load images", error);
+        }
+    };
 }
 
 export default new ImagesStore();

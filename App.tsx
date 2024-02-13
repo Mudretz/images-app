@@ -5,17 +5,21 @@
  * @format
  */
 
-import React from 'react';
-import {SafeAreaView, StatusBar} from 'react-native';
-import {ImageList} from './src/components/ImageList';
+import React from "react";
+import { SafeAreaView, StatusBar } from "react-native";
+import { ImageList } from "./src/components/ImageList";
 
 function App(): React.JSX.Element {
-  return (
-    <SafeAreaView>
-      <StatusBar />
-      <ImageList />
-    </SafeAreaView>
-  );
+    return (
+        <SafeAreaView
+            style={{
+                flex: 1,
+            }}
+        >
+            <StatusBar />
+            <ImageList />
+        </SafeAreaView>
+    );
 }
 
 export default App;
