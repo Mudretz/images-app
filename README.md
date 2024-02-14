@@ -37,7 +37,7 @@ yarn start
 
 Запустите Metro Bundler в своем собственном терминале. Откройте новый терминал из корневого каталога вашего проекта React Native.
 
-В случае ошибка запуска на Android Studio, [решение](https://stackoverflow.com/questions/32634352/react-native-android-build-failed-sdk-location-not-found)
+В случае ошибки запуска на Android Studio, [решение](https://stackoverflow.com/questions/32634352/react-native-android-build-failed-sdk-location-not-found)
 
 Выполните следующую команду, чтобы запустить приложение для Android или iOS:
 
