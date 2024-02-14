@@ -1,15 +1,20 @@
 import { FC, useEffect } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
-import imagesStore from "../../store/imagesStore";
 import { Images } from "../../shared/types";
 import { observer } from "mobx-react-lite";
 import { useAppNavigation } from "../../hooks";
 import { ROUTES } from "../../shared/constants";
+import { Error } from "../../shared/components/ui";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import imagesStore from "../../store/imagesStore";
+import appStore from "../../store/appStore";
+import { ImageCard } from "../ImageCard";
 
 export const ImageList: FC = observer(() => {
     const navigation = useAppNavigation();
-    const { getImages, images, limit, increaseLimit } = imagesStore;
-
+    const { getImages, images, limit, increaseLimit, isError } = imagesStore;
+    const { switchNumberColumn, twoColumns } = appStore;
+    
     useEffect(() => {
         getImages();
     }, [limit]);
@@ -20,22 +25,7 @@ export const ImageList: FC = observer(() => {
         });
     };
 
-    const renderItem = ({ item }: { item: Images }) => {
-        return (
-            <Pressable onPress={() => handleShowDetail(item.id)}>
-                <Image
-                    key={item.id}
-                    height={250}
-                    style={{
-                        width: "100%",
-                    }}
-                    source={{
-                        uri: item.url,
-                    }}
-                />
-            </Pressable>
-        );
-    };
+    if (isError) return <Error />;
 
     return (
         <View
@@ -43,15 +33,40 @@ export const ImageList: FC = observer(() => {
                 flex: 1,
             }}
         >
+            <TouchableOpacity
+                onPress={switchNumberColumn}
+                style={{
+                    backgroundColor: "black",
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                }}
+            >
+                <Text
+                    style={{
+                        color: "white",
+                        fontSize: 18,
+                    }}
+                >
+                    Switch
+                </Text>
+            </TouchableOpacity>
             <FlatList
                 style={{ flexGrow: 1 }}
                 data={images}
                 keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                initialNumToRender={3}
-                maxToRenderPerBatch={5}
-                windowSize={5}
+                renderItem={({ item }) => (
+                    <ImageCard
+                        item={item}
+                        onClick={handleShowDetail}
+                        switchState={twoColumns}
+                    />
+                )}
+                initialNumToRender={twoColumns ? 6 : 3}
+                maxToRenderPerBatch={twoColumns ? 10 : 5}
+                windowSize={twoColumns ? 10 : 5}
                 onEndReached={() => increaseLimit()}
+                numColumns={twoColumns ? 2 : 1}
+                key={twoColumns ? "two-columns" : "one-columns"}
             />
         </View>
     );

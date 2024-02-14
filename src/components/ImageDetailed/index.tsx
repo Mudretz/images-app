@@ -12,6 +12,8 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import { ROUTES } from "../../shared/constants";
 import { ImageModal } from "../ImageModal";
+import { useAppNavigation } from "../../hooks";
+import { Error, Loader } from "../../shared/components/ui";
 import imagesStore from "../../store/imagesStore";
 import userStore from "../../store/userStore";
 
@@ -20,10 +22,16 @@ type RootStackParamList = {
 };
 
 export const ImageDetailed: FC = observer(() => {
+    const navigation = useAppNavigation();
     const { params } =
         useRoute<RouteProp<RootStackParamList, "ImageDetailed">>();
-    const { getImage, image } = imagesStore;
-    const { getUser, user } = userStore;
+    const {
+        getImage,
+        image,
+        isLoading: isLoadingImage,
+        isError: isErrorImage,
+    } = imagesStore;
+    const { getUser, user, isLoading, isError } = userStore;
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -40,10 +48,19 @@ export const ImageDetailed: FC = observer(() => {
         setOpen(!open);
     };
 
+    const handleBack = () => {
+        navigation.goBack();
+    };
+
+    if (isLoading || isLoadingImage) return <Loader />;
+    if (isErrorImage || isError) return <Error />;
     if (!image || !user) return null;
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity onPress={handleBack}>
+                <Text style={styles.text}>Back</Text>
+            </TouchableOpacity>
             <Pressable onPress={onHide}>
                 <Image
                     height={250}
@@ -59,7 +76,6 @@ export const ImageDetailed: FC = observer(() => {
             <View
                 style={{
                     flexDirection: "row",
-                    width: "90%",
                     alignItems: "center",
                     columnGap: 10,
                 }}
@@ -75,6 +91,7 @@ export const ImageDetailed: FC = observer(() => {
                 <View
                     style={{
                         rowGap: 10,
+                        width: "80%",
                     }}
                 >
                     <Text style={styles.title}>{image.title}</Text>
@@ -84,15 +101,6 @@ export const ImageDetailed: FC = observer(() => {
                 </View>
             </View>
             <Text style={styles.text}>{image.description}</Text>
-            <TouchableOpacity style={styles.button}>
-                <Text
-                    style={{
-                        color: "white",
-                    }}
-                >
-                    Show other work
-                </Text>
-            </TouchableOpacity>
             <Modal visible={open} onRequestClose={onHide}>
                 <ImageModal onHide={onHide} url={image.url} />
             </Modal>
