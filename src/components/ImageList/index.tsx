@@ -1,27 +1,39 @@
 import { FC, useEffect } from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
 import imagesStore from "../../store/imagesStore";
 import { Images } from "../../shared/types";
 import { observer } from "mobx-react-lite";
+import { useAppNavigation } from "../../hooks";
+import { ROUTES } from "../../shared/constants";
 
 export const ImageList: FC = observer(() => {
+    const navigation = useAppNavigation();
     const { getImages, images, limit, increaseLimit } = imagesStore;
+
     useEffect(() => {
         getImages();
     }, [limit]);
 
+    const handleShowDetail = (id: string) => {
+        navigation.navigate(ROUTES.imageDetailed, {
+            id: id,
+        });
+    };
+
     const renderItem = ({ item }: { item: Images }) => {
         return (
-            <Image
-                key={item.id}
-                height={250}
-                style={{
-                    width: "100%",
-                }}
-                source={{
-                    uri: item.url,
-                }}
-            />
+            <Pressable onPress={() => handleShowDetail(item.id)}>
+                <Image
+                    key={item.id}
+                    height={250}
+                    style={{
+                        width: "100%",
+                    }}
+                    source={{
+                        uri: item.url,
+                    }}
+                />
+            </Pressable>
         );
     };
 
@@ -29,10 +41,8 @@ export const ImageList: FC = observer(() => {
         <View
             style={{
                 flex: 1,
-                backgroundColor: "black",
             }}
         >
-            <Text>Текст</Text>
             <FlatList
                 style={{ flexGrow: 1 }}
                 data={images}

@@ -4,6 +4,7 @@ import { Images } from "../shared/types";
 
 class ImagesStore {
     images: Images[] = [];
+    image: Images | null = null;
     limit = 10;
 
     constructor() {
@@ -19,14 +20,21 @@ class ImagesStore {
             const response = await imagesService.getImages({
                 limit: this.limit,
             });
-            // Обновляем состояние внутри runInAction, чтобы MobX мог отследить изменения
             runInAction(() => {
                 this.images = response.photos;
             });
-        } catch (error) {
-            // Обработка ошибок, если это необходимо
-            console.error("Failed to load images", error);
-        }
+        } catch (error) {}
+    };
+
+    getImage = async (id: string) => {
+        try {
+            const response = await imagesService.getImageById({
+                id: id,
+            });
+            runInAction(() => {
+                this.image = response.photo;
+            });
+        } catch (error) {}
     };
 }
 

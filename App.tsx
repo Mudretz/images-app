@@ -1,24 +1,29 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
+import "react-native-gesture-handler";
 import React from "react";
 import { SafeAreaView, StatusBar } from "react-native";
-import { ImageList } from "./src/components/ImageList";
+import { Navigation } from "./src/navigation";
+import { NavigationContainer } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function App(): React.JSX.Element {
     return (
-        <SafeAreaView
+        <GestureHandlerRootView
             style={{
                 flex: 1,
             }}
         >
-            <StatusBar />
-            <ImageList />
-        </SafeAreaView>
+            <NavigationContainer>
+                <SafeAreaView
+                    style={{
+                        flex: 1,
+                    }}
+                >
+                    <StatusBar />
+
+                    <Navigation />
+                </SafeAreaView>
+            </NavigationContainer>
+        </GestureHandlerRootView>
     );
 }
 
