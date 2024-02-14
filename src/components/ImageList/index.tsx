@@ -1,28 +1,54 @@
-import { FC, useEffect } from "react";
-import { FlatList, Image, Pressable, Text, View } from "react-native";
-import { Images } from "../../shared/types";
+import { FC, useEffect, useState } from "react";
+import {
+    FlatList,
+    Text,
+    View,
+} from "react-native";
 import { observer } from "mobx-react-lite";
 import { useAppNavigation } from "../../hooks";
 import { ROUTES } from "../../shared/constants";
 import { Error } from "../../shared/components/ui";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { ImageCard } from "../ImageCard";
+import { useDebounce } from "../../hooks/useDebouce";
+import { ImageFilter } from "../ImageFIlter";
 import imagesStore from "../../store/imagesStore";
 import appStore from "../../store/appStore";
-import { ImageCard } from "../ImageCard";
 
 export const ImageList: FC = observer(() => {
     const navigation = useAppNavigation();
-    const { getImages, images, limit, increaseLimit, isError } = imagesStore;
+    const {
+        getImages,
+        getFilterImages,
+        images,
+        filterImages,
+        limit,
+        increaseLimit,
+        isError,
+    } = imagesStore;
     const { switchNumberColumn, twoColumns } = appStore;
-    
+    const [value, setValue] = useState("");
+
     useEffect(() => {
         getImages();
     }, [limit]);
+
+    useEffect(() => {
+        getFilterImages(value);
+    }, [useDebounce(value)]);
 
     const handleShowDetail = (id: string) => {
         navigation.navigate(ROUTES.imageDetailed, {
             id: id,
         });
+    };
+
+    const handleChangeValue = (v: string) => {
+        setValue(v);
+    };
+
+    const handleClear = () => {
+        setValue("");
     };
 
     if (isError) return <Error />;
@@ -50,9 +76,14 @@ export const ImageList: FC = observer(() => {
                     Switch
                 </Text>
             </TouchableOpacity>
+            <ImageFilter
+                value={value}
+                onChange={handleChangeValue}
+                onClear={handleClear}
+            />
             <FlatList
                 style={{ flexGrow: 1 }}
-                data={images}
+                data={!!useDebounce(value) ? filterImages : images}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <ImageCard

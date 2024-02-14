@@ -4,6 +4,7 @@ import { Images } from "../shared/types";
 
 class ImagesStore {
     images: Images[] = [];
+    filterImages: Images[] = [];
     image: Images | null = null;
     isLoading = false;
     isError = false;
@@ -46,6 +47,16 @@ class ImagesStore {
         } catch (error) {
             this.isLoading = false;
             this.isError = true;
+        }
+    };
+
+    getFilterImages = (value: string) => {
+        if (value) {
+            this.filterImages = this.images.filter((item) =>
+                item.title.toLowerCase().includes(value.trim().toLowerCase()),
+            );
+        } else {
+            this.filterImages = [];
         }
     };
 }
