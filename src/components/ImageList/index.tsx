@@ -1,14 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import {
-    FlatList,
-    Text,
-    View,
-} from "react-native";
+import { FlatList, View } from "react-native";
 import { observer } from "mobx-react-lite";
 import { useAppNavigation } from "../../hooks";
 import { ROUTES } from "../../shared/constants";
-import { Error } from "../../shared/components/ui";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ButtonText, Error } from "../../shared/components/ui";
 import { ImageCard } from "../ImageCard";
 import { useDebounce } from "../../hooks/useDebouce";
 import { ImageFilter } from "../ImageFIlter";
@@ -26,7 +21,7 @@ export const ImageList: FC = observer(() => {
         increaseLimit,
         isError,
     } = imagesStore;
-    const { switchNumberColumn, twoColumns } = appStore;
+    const { switchNumberColumn, twoColumns, isAuth, logOut } = appStore;
     const [value, setValue] = useState("");
 
     useEffect(() => {
@@ -51,6 +46,14 @@ export const ImageList: FC = observer(() => {
         setValue("");
     };
 
+    const handleAuth = () => {
+        if (!isAuth) {
+            navigation.navigate(ROUTES.auth);
+        } else {
+            logOut();
+        }
+    };
+
     if (isError) return <Error />;
 
     return (
@@ -59,23 +62,20 @@ export const ImageList: FC = observer(() => {
                 flex: 1,
             }}
         >
-            <TouchableOpacity
-                onPress={switchNumberColumn}
+            <View
                 style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                     backgroundColor: "black",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
                 }}
             >
-                <Text
-                    style={{
-                        color: "white",
-                        fontSize: 18,
-                    }}
-                >
-                    Switch
-                </Text>
-            </TouchableOpacity>
+                <ButtonText onPress={switchNumberColumn}>Switch</ButtonText>
+                {isAuth ? (
+                    <ButtonText onPress={handleAuth}>Exit</ButtonText>
+                ) : (
+                    <ButtonText onPress={handleAuth}>Login</ButtonText>
+                )}
+            </View>
             <ImageFilter
                 value={value}
                 onChange={handleChangeValue}

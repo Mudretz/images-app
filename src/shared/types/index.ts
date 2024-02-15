@@ -20,3 +20,8 @@ export interface User {
     city: string;
     profile_picture: string;
 }
+
+export interface UserInfo {
+    email: string;
+    password: string;
+}
